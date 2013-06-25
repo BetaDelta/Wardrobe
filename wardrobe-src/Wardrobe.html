@@ -3,11 +3,162 @@
 </head>
 
 <body>
-  {{> hello}}
+	{{> myHeader}}
+	{{renderPage}}
+	{{> myFooter}}
 </body>
 
+
+
+<template name="myHeader">
+<!-- Nav and Banner -->
+<nav class="top-bar">
+    <ul class="title-area">
+      <!-- Title Area -->
+      <li class="name">
+        <h1>
+          <a href="/">
+            Airwear Ltd.
+          </a>
+        </h1>
+      </li>
+      <li class="toggle-topbar menu-icon"><a href="#"><span>menu</span></a></li>
+    </ul>
+ 
+    <section class="top-bar-section">
+      <!-- Right Nav Section -->
+      <ul class="right">
+        <li class="divider"></li>
+        <li class="has-dropdown">
+          <a href="#">Main Item 1</a>
+          <ul class="dropdown">
+            <li><label>Section Name</label></li>
+            <li class="has-dropdown">
+              <a href="#" class="">Has Dropdown, Level 1</a>
+              <ul class="dropdown">
+                <li><a href="#">Dropdown Options</a></li>
+                <li><a href="#">Dropdown Options</a></li>
+                <li><a href="#">Level 2</a></li>
+                <li><a href="#">Subdropdown Option</a></li>
+                <li><a href="#">Subdropdown Option</a></li>
+                <li><a href="#">Subdropdown Option</a></li>
+              </ul>
+            </li>
+            <li><a href="#">Dropdown Option</a></li>
+            <li><a href="#">Dropdown Option</a></li>
+            <li class="divider"></li>
+            <li><label>Section Name</label></li>
+            <li><a href="#">Dropdown Option</a></li>
+            <li><a href="#">Dropdown Option</a></li>
+            <li><a href="#">Dropdown Option</a></li>
+            <li class="divider"></li>
+            <li><a href="#">See all &rarr;</a></li>
+          </ul>
+        </li>
+        <li class="divider"></li>
+        <li><a href="#">Main Item 2</a></li>
+        <li class="divider"></li>
+        <li class="has-dropdown">
+          <a href="#">Main Item 3</a>
+          <ul class="dropdown">
+            <li><a href="#">Dropdown Option</a></li>
+            <li><a href="#">Dropdown Option</a></li>
+            <li><a href="#">Dropdown Option</a></li>
+            <li class="divider"></li>
+            <li><a href="#">See all &rarr;</a></li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+  </nav>
+ 
+</template>
+
+<template name="myFooter">
+  <!-- Footer -->
+  
+  <footer class="row">
+    <div class="large-12 columns">
+      <hr />
+      <div class="row">
+        <div class="large-6 columns">
+          <p>&copy; Copyright Rahul Dhodapkar</p>
+        </div>
+      </div>
+    </div> 
+  </footer>
+</template>
+
+<template name="home">
+
+  <div class="row">
+    <div class="large-12 columns">
+
+      <!-- Main Banner Image - place in a paragraph to enforce the modular scale spacing -->
+      <p><img src="http://placehold.it/1000x400&text=[banner img]" /></p>
+    </div>
+  </div>
+  
+  <!-- End Nav and Banner -->
+  
+  
+  <!-- Main Content Section -->
+  
+  <div class="row">
+  
+    <div class="large-8 columns">
+      <h4>This is a content section.</h4>
+      <p>Bacon ipsum dolor sit amet nulla ham qui sint exercitation eiusmod commodo, chuck duis velit. Aute in reprehenderit, dolore aliqua non est magna in labore pig pork biltong. Eiusmod swine spare ribs reprehenderit culpa. Boudin aliqua adipisicing rump corned beef.</p>
+      <p>Bacon ipsum dolor sit amet nulla ham qui sint exercitation eiusmod commodo, chuck duis velit. Aute in reprehenderit, dolore aliqua non est magna in labore pig pork biltong. Eiusmod swine spare ribs reprehenderit culpa. Boudin aliqua adipisicing rump corned beef.</p>
+      <p><a href="#" class="secondary small button">Next Page &rarr;</a></p>
+    </div>
+    
+    <div class="large-4 columns">
+    
+      <!-- Gallery sidebar with a block grid. Note: block grid items should be the same size for optimal results -->
+      
+      <ul class="small-block-grid-3">
+        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
+        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
+        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
+        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
+        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
+        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
+      </ul>
+    </div>
+        
+  </div>
+  
+  
+  <!-- Call to Action Panel -->
+  <div class="row">
+    <div class="large-12 columns">
+    
+      <div class="panel">
+        <h4>Get in touch!</h4>
+            
+        <div class="row">
+          <div class="large-9 columns">
+            <p>We'd love to hear from you, you attractive person you.</p>
+          </div>
+          <div class="large-3 columns">
+            <a href="#" class="radius button right">Contact Us</a>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  
+</template>
+
+
+
+
 <template name="hello">
-  <h1>Hello World!</h1>
+  <h1>Hello my World!</h1>
   {{greeting}}
+	{{testing.name}}
   <input type="button" value="Click" />
 </template>
