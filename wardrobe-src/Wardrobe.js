@@ -2,7 +2,14 @@ Temp = new Meteor.Collection("TempDb");
 
 ImageData = new Meteor.Collection("ImageData");
 
-ImagesDataFS = new CollectionFS("ImageData", {autopublish:false});
+ImageDataFS = new CollectionFS("ImageData", {autopublish:false});
+
+ImageDataFS.allow({
+	insert: function(userId, myFile) {return true;},
+	update: function(userId, myFile) {return true;},
+	remove: function(userId, myFile) {return true;}
+});
+
 
 
 if (Meteor.isClient) {
@@ -12,6 +19,14 @@ if (Meteor.isClient) {
 		$('#imgUpload').change(function(){
 			readURL(this);
 		});
+
+		$('#subjectImage').ready(function(){
+			//alert("done");
+			setTimeout(function(){initializeImage();},1000);
+			//alert("done here too");
+			//initializeImage();
+		});
+
 
 
 	});
@@ -26,7 +41,16 @@ if (Meteor.isClient) {
 			return 'post'
 		},
 		
-		'/upload': 'uploadImage'
+		'/upload': 'uploadImage',
+
+		'/rate': function(){
+			//setTimeout(function(){
+				//alert("being called");
+			//	initializeImage();
+			//}, 1000);
+			//Meteor.defer(function(){initializeImage();});
+			return 'rateImage'
+		}
 	});
 
 
@@ -100,18 +124,65 @@ if (Meteor.isClient) {
 	Template.uploadImage.events({
 		'click .submitButton' : function(e) {
 			alert("hellow");
-			var file = $("#imgUpload").files;
-			alert("hello again");
+			var files = $("#imgUpload").prop("files");
+			
+			var fileId = ImageDataFS.storeFile(files[0]);
+			
+			alert(fileId);
+			alert("got here");
 			
 		}
 	});
+
+///////////////////////////////////////////////////////
+///			functions for 'rateImage' template					///
+///////////////////////////////////////////////////////
+
+var cacheImageResult;
+
+
+
+	 var initializeImage = function () {
+	 	alert("trying to initialize now");
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			//alert("loaded properly");
+			$('#subjectImage').attr("src", e.target.result);
+			//alert("result recieved");
+			//cacheImageResult = e.target.result;
+		};
+	
+		//alert(JSON.stringify(Meteor.user()));
+
+		var imageRecord = ImageDataFS.findOne({"owner":Meteor.user()._id});
+		
+		//alert(imageRecord._id);
+
+		//alert(JSON.stringify(imageRecord));
+
+		var blob = ImageDataFS.retrieveBlob(imageRecord._id, function(fileItem){
+			if(fileItem.blob)
+				reader.readAsDataURL(fileItem.blob);
+			else
+				reader.readAsDataURL(fileItem.file);
+		});
+
+		return null;
+	};
+
+	Template.rateImage.rendered = function() {
+		//alert("rate image page rendered");
+		//initializeImage();
+	};
+
+
+
+
 
 
 ///////////////////////////////////////////////////////
 ///			auxiliary functions for application					///
 ///////////////////////////////////////////////////////
-
-
 
 
 	function readURL(input) {

@@ -124,8 +124,6 @@
       
     </div>
   </div>
-  
-  
 </template>
 
 
@@ -137,6 +135,9 @@
 	{{testing.name}}
   <input type="button" value="Click" />
 </template>
+
+
+
 
 <template name="uploadImage">
 <form>
@@ -151,13 +152,26 @@
       <label>Input Image</label>
     	<input type="file" id="imgUpload" placeholder="large-4.columns">
     </div>
-		<button class="submitButton">Submit</button>	
-	</fieldset>
 
+	</fieldset>
 </form>
+<button class="submitButton">Submit</button>	
 </template>
 
 
+
+<template name="rateImage">
+<div class="row">
+	<div class="col float left">
+		<img name ="subjectImage" id="subjectImage" src="#">
+	</div>
+	<div class= "col">
+			<button class="upButton" style="background-color:green;">Yes!</button>
+			<button class="downButton" style="background-color:red;">No!</button>
+	</div>
+</div>
+
+</template>
 
 
 
