@@ -3,18 +3,24 @@
   "dependencies": {
     "basePackages": {
       "foundation": {},
-      "router": {}
+      "router": {},
+      "collectionFS": {}
     },
     "packages": {
       "foundation": {
         "git": "https://github.com/ewall/meteor-foundation.git",
-        "tag": "v4.2.2",
-        "commit": "cfc743d6902306983787a476c671337bb006ed60"
+        "tag": "v4.2.3",
+        "commit": "8e780b8c80c94bf64f1cbd66142dda6b459710bb"
       },
       "router": {
         "git": "https://github.com/tmeasday/meteor-router.git",
         "tag": "v0.5.1",
         "commit": "32e377c7703bb119acccc859fc7296882903cbe7"
+      },
+      "collectionFS": {
+        "git": "https://github.com/raix/Meteor-CollectionFS.git",
+        "tag": "v0.2.3",
+        "commit": "4a1b9298a7ce64269fd14be29d9c4797b9253103"
       },
       "page-js-ie-support": {
         "git": "https://github.com/tmeasday/meteor-page-js-ie-support.git",

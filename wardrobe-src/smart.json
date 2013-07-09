@@ -1,6 +1,7 @@
 {
   "packages": {
     "foundation": {},
-    "router": {}
+    "router": {},
+    "collectionFS": {}
   }
 }

@@ -1,11 +1,17 @@
 <head>
   <title>Wardrobe</title>
+	<script src="/js/custom.modernizr.js"></script>
+	<script src="/js/foundation.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+	
 </head>
 
 <body>
 	{{> myHeader}}
 	{{renderPage}}
 	{{> myFooter}}
+
+
 </body>
 
 
@@ -30,49 +36,18 @@
       <ul class="right">
         <li class="divider"></li>
         <li class="has-dropdown">
-          <a href="#">Main Item 1</a>
-          <ul class="dropdown">
-            <li><label>Section Name</label></li>
-            <li class="has-dropdown">
-              <a href="#" class="">Has Dropdown, Level 1</a>
-              <ul class="dropdown">
-                <li><a href="#">Dropdown Options</a></li>
-                <li><a href="#">Dropdown Options</a></li>
-                <li><a href="#">Level 2</a></li>
-                <li><a href="#">Subdropdown Option</a></li>
-                <li><a href="#">Subdropdown Option</a></li>
-                <li><a href="#">Subdropdown Option</a></li>
-              </ul>
-            </li>
-            <li><a href="#">Dropdown Option</a></li>
-            <li><a href="#">Dropdown Option</a></li>
-            <li class="divider"></li>
-            <li><label>Section Name</label></li>
-            <li><a href="#">Dropdown Option</a></li>
-            <li><a href="#">Dropdown Option</a></li>
-            <li><a href="#">Dropdown Option</a></li>
-            <li class="divider"></li>
-            <li><a href="#">See all &rarr;</a></li>
-          </ul>
-        </li>
-        <li class="divider"></li>
-        <li><a href="#">Main Item 2</a></li>
-        <li class="divider"></li>
-        <li class="has-dropdown">
-          <a href="#">Main Item 3</a>
-          <ul class="dropdown">
-            <li><a href="#">Dropdown Option</a></li>
-            <li><a href="#">Dropdown Option</a></li>
-            <li><a href="#">Dropdown Option</a></li>
-            <li class="divider"></li>
-            <li><a href="#">See all &rarr;</a></li>
-          </ul>
+          <a href="#" name="userButton" class="login-button">{{userName}}</a>
         </li>
       </ul>
     </section>
+	<div class = "row float right" name="login-bar" id="login-bar" style="padding-right:10px;display:none;">
+		<div class = "row float right large-4 columns" style="background-color:#AAAAAA;">
+			Using a row here
+		</div>
+	</div>
+
   </nav>
- 
-</template>
+	</template>
 
 <template name="myFooter">
   <!-- Footer -->
@@ -162,3 +137,29 @@
 	{{testing.name}}
   <input type="button" value="Click" />
 </template>
+
+<template name="uploadImage">
+<form>
+  <fieldset>
+    <legend>Fieldset</legend>
+
+    <div class="row">
+			<img id = "preview", src="#" alt="your image" />
+    </div>
+
+    <div class="row">
+      <label>Input Image</label>
+    	<input type="file" id="imgUpload" placeholder="large-4.columns">
+    </div>
+		<button class="submitButton">Submit</button>	
+	</fieldset>
+
+</form>
+</template>
+
+
+
+
+
+
+

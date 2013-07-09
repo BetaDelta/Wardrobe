@@ -7,3 +7,6 @@ autopublish
 insecure
 preserve-inputs
 backbone
+accounts-facebook
+accounts-google
+accounts-password
