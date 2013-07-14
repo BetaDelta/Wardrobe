@@ -1,179 +1,108 @@
 <head>
   <title>Wardrobe</title>
-	<script src="/js/custom.modernizr.js"></script>
-	<script src="/js/foundation.min.js"></script>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
-	
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 </head>
 
 <body>
-	{{> myHeader}}
-	{{renderPage}}
-	{{> myFooter}}
-
-
+	{{> Main}}
 </body>
+<template name="Main">
+	{{> myHeader}}
+	{{> myFooter}}
+	{{#if SignedIn}}
+		{{> loggedIn}}
+	{{else}}
+		{{> loginLite}}
+	{{/if}}
 
-
+</template>
 
 <template name="myHeader">
-<!-- Nav and Banner -->
-<nav class="top-bar">
-    <ul class="title-area">
-      <!-- Title Area -->
-      <li class="name">
-        <h1>
-          <a href="/">
-            Airwear Ltd.
-          </a>
-        </h1>
-      </li>
-      <li class="toggle-topbar menu-icon"><a href="#"><span>menu</span></a></li>
-    </ul>
- 
-    <section class="top-bar-section">
-      <!-- Right Nav Section -->
-      <ul class="right">
-        <li class="divider"></li>
-        <li class="has-dropdown">
-          <a href="#" name="userButton" class="login-button">{{userName}}</a>
-        </li>
-      </ul>
-    </section>
-	<div class = "row float right" name="login-bar" id="login-bar" style="padding-right:10px;display:none;">
-		<div class = "row float right large-4 columns" style="background-color:#AAAAAA;">
-			Using a row here
-		</div>
-	</div>
-
-  </nav>
-	</template>
+</template>
 
 <template name="myFooter">
-  <!-- Footer -->
-  
-  <footer class="row">
-    <div class="large-12 columns">
-      <hr />
-      <div class="row">
-        <div class="large-6 columns">
-          <p>&copy; Copyright Rahul Dhodapkar</p>
-        </div>
-      </div>
-    </div> 
-  </footer>
 </template>
 
-<template name="home">
+<template name="scripts">
+    <!-- Load JS here for greater good =============================-->
+    <script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="js/jquery.ui.touch-punch.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-select.js"></script>
+    <script src="js/bootstrap-switch.js"></script>
+    <script src="js/flatui-checkbox.js"></script>
+    <script src="js/flatui-radio.js"></script>
+    <script src="js/jquery.tagsinput.js"></script>
+    <script src="js/jquery.placeholder.js"></script>
+    <script src="js/jquery.stacktable.js"></script>
+    <script src="http://vjs.zencdn.net/c/video.js"></script>
+    <script src="js/application.js"></script>
+</template>
 
-  <div class="row">
-    <div class="large-12 columns">
+<!-- START BODY NOW -->
+<template name="loginLite">
+		<div class="centered-login">
+				<div id="login-dropdown-list" class="accounts-dialog" style="position:relative;padding:40px;">
+						Get started today! <br />
+							<div class="login-close-text-clear"></div>
+							<div class="login-text-and-button">
+						<div class="login-button single-login-button " id="login-buttons-facebook">
+							<div class="login-image" id="login-buttons-image-facebook"></div>
+								<span class="text-besides-image sign-in-text-facebook">Sign in with Facebook</span>
+						</div>
+				</div>
+		</div>
 
-      <!-- Main Banner Image - place in a paragraph to enforce the modular scale spacing -->
-      <p><img src="http://placehold.it/1000x400&text=[banner img]" /></p>
-    </div>
-  </div>
-  
-  <!-- End Nav and Banner -->
-  
-  
-  <!-- Main Content Section -->
-  
-  <div class="row">
-  
-    <div class="large-8 columns">
-      <h4>This is a content section.</h4>
-      <p>Bacon ipsum dolor sit amet nulla ham qui sint exercitation eiusmod commodo, chuck duis velit. Aute in reprehenderit, dolore aliqua non est magna in labore pig pork biltong. Eiusmod swine spare ribs reprehenderit culpa. Boudin aliqua adipisicing rump corned beef.</p>
-      <p>Bacon ipsum dolor sit amet nulla ham qui sint exercitation eiusmod commodo, chuck duis velit. Aute in reprehenderit, dolore aliqua non est magna in labore pig pork biltong. Eiusmod swine spare ribs reprehenderit culpa. Boudin aliqua adipisicing rump corned beef.</p>
-      <p><a href="#" class="secondary small button">Next Page &rarr;</a></p>
-    </div>
-    
-    <div class="large-4 columns">
-    
-      <!-- Gallery sidebar with a block grid. Note: block grid items should be the same size for optimal results -->
-      
-      <ul class="small-block-grid-3">
-        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
-        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
-        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
-        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
-        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
-        <li><a href="#"><img src="http://placehold.it/120x120" /></a></li>
-      </ul>
-    </div>
-        
-  </div>
-  
-  
-  <!-- Call to Action Panel -->
-  <div class="row">
-    <div class="large-12 columns">
-    
-      <div class="panel">
-        <h4>Get in touch!</h4>
-            
-        <div class="row">
-          <div class="large-9 columns">
-            <p>We'd love to hear from you, you attractive person you.</p>
-          </div>
-          <div class="large-3 columns">
-            <a href="#" class="radius button right">Contact Us</a>
-          </div>
-        </div>
-      </div>
-      
-    </div>
-  </div>
 </template>
 
 
-
-
-<template name="hello">
-  <h1>Hello my World!</h1>
-  {{greeting}}
-	{{testing.name}}
-  <input type="button" value="Click" />
+<template name="loggedIn">
+	{{#if	UploadActive}}
+		{{>	uploadActivity}}
+	{{else}}
+		{{> rateActivity}}
+	{{/if}}
 </template>
 
+<template name="uploadActivity">
+	<div class="main-float-body">
+		<form>
+			<fieldset>
+				<legend>Fieldset</legend>
 
+				<div class="row">
+					<img id = "preview", src="#" alt="your image" />
+				</div>
 
+				<div class="row">
+					<label>Input Image</label>
+					<input type="file" id="imgUpload" placeholder="large-4.columns">
+				</div>
 
-<template name="uploadImage">
-<form>
-  <fieldset>
-    <legend>Fieldset</legend>
-
-    <div class="row">
-			<img id = "preview", src="#" alt="your image" />
-    </div>
-
-    <div class="row">
-      <label>Input Image</label>
-    	<input type="file" id="imgUpload" placeholder="large-4.columns">
-    </div>
-
-	</fieldset>
-</form>
-<button class="submitButton">Submit</button>	
-</template>
-
-
-
-<template name="rateImage">
-<div class="row">
-	<div class="col float left">
-		<img name ="subjectImage" id="subjectImage" src="#">
+			</fieldset>
+		</form>
+		<button class="submitButton">Submit</button>	
 	</div>
-	<div class= "col">
-			<button class="upButton" style="background-color:green;">Yes!</button>
-			<button class="downButton" style="background-color:red;">No!</button>
-	</div>
-</div>
-
 </template>
 
-
-
+<template name="rateActivity">
+	<div class="main-float-body">
+		<div class="row">
+			<div class="col float left">
+				<img name ="subjectImage" id="subjectImage" src="{{randImage}}">
+			</div>
+			<div class= "col">
+					<button class="upButton" style="background-color:green;">Yes!</button>
+					<button class="downButton" style="background-color:red;">No!</button>
+			</div>
+			<div class ="row">
+				<span> Upvotes: {{imageData.up}} </span>
+				<span> Downvotes: {{imageData.down}} </span>
+			</div>
+		</div>
+	</div>
+</template>
 
 

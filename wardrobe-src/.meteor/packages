@@ -8,5 +8,5 @@ insecure
 preserve-inputs
 backbone
 accounts-facebook
-accounts-google
 accounts-password
+accounts-ui

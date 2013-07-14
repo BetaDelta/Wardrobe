@@ -1,4 +1,7 @@
-Temp = new Meteor.Collection("TempDb");
+
+////////////////////////////////////////////////////////////
+/////////////  DEFINE DATA MODEL   /////////////////////////
+////////////////////////////////////////////////////////////
 
 ImageData = new Meteor.Collection("ImageData");
 
@@ -10,7 +13,15 @@ ImageDataFS.allow({
 	remove: function(userId, myFile) {return true;}
 });
 
+////////////////////////////////////////////////////////////
+/////////////  END DATA MODEL   ////////////////////////////
+////////////////////////////////////////////////////////////
 
+
+
+////////////////////////////////////////////////////////////
+/////////////  BEGIN CLIENT BLOCK   ////////////////////////
+////////////////////////////////////////////////////////////
 
 if (Meteor.isClient) {
 	Meteor.startup(function() {
@@ -19,68 +30,229 @@ if (Meteor.isClient) {
 		$('#imgUpload').change(function(){
 			readURL(this);
 		});
-
-		$('#subjectImage').ready(function(){
-			//alert("done");
-			setTimeout(function(){initializeImage();},1000);
-			//alert("done here too");
-			//initializeImage();
-		});
-
-
-
-	});
-
-	Meteor.Router.add({
-		'/': 'home',
-
-		'/welcome': 'hello',
-
-		'/posts/:id':function(id) {
-			Session.set('postId', id);
-			return 'post'
-		},
 		
-		'/upload': 'uploadImage',
-
-		'/rate': function(){
-			//setTimeout(function(){
-				//alert("being called");
-			//	initializeImage();
-			//}, 1000);
-			//Meteor.defer(function(){initializeImage();});
-			return 'rateImage'
-		}
 	});
 
 
-	/*
-	Meteor.Router.filters({
-		requireLogin: function(page) {
-			var username = Session.get('username');
-			if(username)
-				return page;
-			else
-				return 'sign_in';
+////////////// UNTRUSTED BLOCK //////////////////////////
+
+/*
+    (function(d, debug){
+         var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement('script'); js.id = id; js.async = true;
+         js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
+         ref.parentNode.insertBefore(js, ref);
+       }(document,  false));
+       
+    window.fbAsyncInit = function() {
+            // init the FB JS SDK
+        FB.init({
+          appId      : 'YOUR_APP_ID', // App ID from the App Dashboard
+          channelUrl : '//localhost:3000/channel.html', // Channel File for x-domain communication for localhost debug
+          // channelUrl : '//yoururl.com/channel.html', // Channel File for x-domain communication
+          status     : true, // check the login status upon init?
+          cookie     : true, // set sessions cookies to allow your server to access the session?
+          xfbml      : true  // parse XFBML tags on this page?
+        });
+    
+        FB.getLoginStatus(checkLoginStatus);
+        
+        function call_facebook_login(response){
+            FB.api('/me', function(fb_user){
+                var access_token = response.authResponse.accessToken;
+                Meteor.call('facebook_login', fb_user, access_token, function(error, user_id){
+                    if (!error){
+                        Accounts._makeClientLoggedIn(user_id, access_token);
+                    }
+                });
+            });
+        }
+    
+        function checkLoginStatus(response) {
+            if(response && response.status == 'connected') {
+                console.log('User is authorized');
+          
+                // Now Personalize the User Experience
+                console.log('Access Token: ' + response.authResponse.accessToken);
+                console.log(response)
+                call_facebook_login(response);
+            } else {
+                console.log('User is not authorized');
+                
+                // Login the user
+                FB.login(function(response) {
+                    if (response.authResponse) {
+                        console.log('Welcome!  Fetching your information.... ');
+                        call_facebook_login(response);
+                    } else {
+                        console.log('User cancelled login or did not fully authorize.');
+                    }
+                }, {scope: 'email,friends_likes,friends_birthday'});
+            }
+        }
+    }
+
+*/
+/////////////// end untrusted block /////////////////////
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////
+///			functions for 'Main' template							  ///
+///////////////////////////////////////////////////////
+
+
+	Template.Main.SignedIn = function(){
+		return (Meteor.user() ? true : false);	
+	};
+
+///////////////////////////////////////////////////////
+///			functions for 'login-lite' template				  ///
+///////////////////////////////////////////////////////
+
+	Template.loginLite.events({
+		'click #login-buttons-facebook' : function() {
+			Meteor.loginWithFacebook({requestPermissions: ['email']},
+			function(error) {
+				if (error) {
+					return console.log(error);
+				}
+			});
+			Session.set("activity", "upload");
 		}
-	
 	});
 
-	Meteor.Router.filter('requireLogin', {only: 'welcome'});
-  */
-	
+///////////////////////////////////////////////////////
+///			functions for 'loggedIn' template		  		  ///
+///////////////////////////////////////////////////////
+
+
+	Template.loggedIn.UploadActive = function() {
+		return ((Session.get("activity") == "upload") ? true : false);
+	}
+
+
+///////////////////////////////////////////////////////
+///			functions for 'uploadActivity' template			///
+///////////////////////////////////////////////////////
+
+	Template.uploadActivity.events({
+		'click .submitButton' : function(e) {
+			var files = $("#imgUpload").prop("files");
+			
+			var myFileId = ImageDataFS.storeFile(files[0]);
+			// now we need to store the fileId in ImageData so
+			// we can access it later for image recall.
+			
+			//alert("helloworld");
+			try{
+				ImageData.insert({"owner":Meteor.user()._id,
+												"fileId":myFileId,
+												"randIndex":Math.random(),
+												"rated":0,
+												"up":0,
+												"down":0
+												});
+			}catch(e){
+			alert(e);
+			}
+			//alert(myFileId);
+			//alert("got here");
+			Session.set("activity", "rate");
+		}
+	});
+
+///////////////////////////////////////////////////////
+///			functions for 'rateActivity' template				///
+///////////////////////////////////////////////////////
+
+	Template.rateActivity.imageData = function() { 
+		if(Session.get("currImageId") == null) {
+			return null;
+		} else {
+			return ImageData.findOne({fileId:Session.get("currImageId")});
+		}
+	}
+
+	Template.rateActivity.randImage = function() {
+		
+		var reader = new FileReader();
+
+		reader.onload = function(e) {
+			$('#subjectImage').attr("src", e.target.result);
+		};
+
+		//alert(JSON.stringify(Meteor.user()));
+		//alert(Meteor.loggingIn());
+		if(Meteor.user() != null){
+			//alert("if");
+			var myRand = Math.random();
+			console.log(myRand);
+			var imageRecords = ImageData.find({randIndex: {$gte:myRand}}, {sort: {randIndex: 1}});
+			var imageRecord = imageRecords.fetch()[0];
+			if (imageRecord == null) {
+				imageRecords = ImageData.find({randIndex: {$lte:myRand}}, {sort: {randIndex: 1}});
+				imageRecord = imageRecords.fetch()[0];
+			}
+			Session.set("currImageId", imageRecord.fileId); //***SESSION***
+			Session.set("imageUpdateId", imageRecord._id); //***DEV***
+		}
+		else {
+			alert("else");
+			// this should never happen, and will crash the application.
+			setTimeout(function() {initializeImage();}, 100);
+			return "#";
+		}
+
+		//alert(JSON.stringify(imageRecord));
+
+		var blob = ImageDataFS.retrieveBlob(imageRecord.fileId, 
+			function(fileItem){
+				if(fileItem.blob)
+					reader.readAsDataURL(fileItem.blob);
+				else
+					reader.readAsDataURL(fileItem.file);
+			});
+		
+		return "#";
+	};
+
+	Template.rateActivity.events({
+		'click .upButton' : function() {
+			if(Session.get("imageUpdateId") != null) {
+				ImageData.update( 
+					{ _id:Session.get("imageUpdateId") }, 
+					{ $inc: { up: 1} }
+				);									
+			}
+		},
+		'click .downButton' : function() {
+			if(Session.get("imageUpdateId") != null) {
+				ImageData.update( 
+					{ _id:Session.get("imageUpdateId") }, 
+					{ $inc: { down: 1} }
+				);									
+			}
+		}
+	});
 
 ///////////////////////////////////////////////////////
 ///			functions for 'hello' template							///
 ///////////////////////////////////////////////////////
-
+/*
 	Template.hello.greeting = function () {
 		return JSON.stringify(Meteor.user());
 	};
 	
   Template.hello.testing = function () {
-    var currUser = Temp.findOne({"id":0}, {"name": 1});
-		return currUser;
+		return {name:"User"};
   };
 
   Template.hello.events({
@@ -123,13 +295,21 @@ if (Meteor.isClient) {
 
 	Template.uploadImage.events({
 		'click .submitButton' : function(e) {
-			alert("hellow");
 			var files = $("#imgUpload").prop("files");
 			
-			var fileId = ImageDataFS.storeFile(files[0]);
+			var myFileId = ImageDataFS.storeFile(files[0]);
+			// now we need to store the fileId in ImageData so
+			// we can access it later for image recall.
 			
-			alert(fileId);
-			alert("got here");
+			//alert("helloworld");
+			try{
+				ImageData.insert({"owner":Meteor.user()._id,
+												"fileId":myFileId});
+			}catch(e){
+			alert(e);
+			}
+			alert(myFileId);
+			//alert("got here");
 			
 		}
 	});
@@ -138,37 +318,71 @@ if (Meteor.isClient) {
 ///			functions for 'rateImage' template					///
 ///////////////////////////////////////////////////////
 
-var cacheImageResult;
-
-
 
 	 var initializeImage = function () {
-	 	alert("trying to initialize now");
+	 //	alert("trying to initialize now");
 		var reader = new FileReader();
+
 		reader.onload = function(e) {
-			//alert("loaded properly");
 			$('#subjectImage').attr("src", e.target.result);
-			//alert("result recieved");
-			//cacheImageResult = e.target.result;
 		};
 	
 		//alert(JSON.stringify(Meteor.user()));
 
-		var imageRecord = ImageDataFS.findOne({"owner":Meteor.user()._id});
-		
-		//alert(imageRecord._id);
+		if(Meteor.user() != null){
+			alert("if");
+			var imageRecord = ImageData.findOne({"owner":Meteor.user()._id});
+		}
+		else {
+			alert("else");
+			setTimeout(function() {initializeImage();}, 100);
+			return;
+		}
 
-		//alert(JSON.stringify(imageRecord));
-
-		var blob = ImageDataFS.retrieveBlob(imageRecord._id, function(fileItem){
+		var blob = ImageDataFS.retrieveBlob(imageRecord.fileId, function(fileItem){
 			if(fileItem.blob)
 				reader.readAsDataURL(fileItem.blob);
 			else
 				reader.readAsDataURL(fileItem.file);
 		});
 
-		return null;
+		return reader.result;
 	};
+
+	
+	Template.rateImage.randImage = function() {
+		
+		var reader = new FileReader();
+
+		reader.onload = function(e) {
+			$('#subjectImage').attr("src", e.target.result);
+		};
+
+		//alert(JSON.stringify(Meteor.user()));
+		//alert(Meteor.loggingIn());
+		if(Meteor.user() != null){
+			alert("if");
+			var imageRecord = ImageData.findOne({"owner":Meteor.user()._id});
+		}
+		else {
+			alert("else");
+			setTimeout(function() {initializeImage();}, 100);
+			return "#";
+		}
+
+		//alert(JSON.stringify(imageRecord));
+
+		var blob = ImageDataFS.retrieveBlob(imageRecord.fileId, 
+			function(fileItem){
+				if(fileItem.blob)
+					reader.readAsDataURL(fileItem.blob);
+				else
+					reader.readAsDataURL(fileItem.file);
+			});
+		
+		return "#";
+	};
+
 
 	Template.rateImage.rendered = function() {
 		//alert("rate image page rendered");
@@ -178,7 +392,7 @@ var cacheImageResult;
 
 
 
-
+*/
 
 ///////////////////////////////////////////////////////
 ///			auxiliary functions for application					///
@@ -197,20 +411,36 @@ var cacheImageResult;
 		}
 	}
 	
-
-
 }
+
+////////////////////////////////////////////////////////////
+/////////////  END CLIENT BLOCK   //////////////////////////
+////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////
+/////////////  BEGIN SERVER BLOCK   ////////////////////////
+////////////////////////////////////////////////////////////
+
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
     // code to run on server at startup
-		if (Temp.find().count() === 0) {
-			var names = ["Rahul",
-									 "Alan",
-									 "Brian"];
-			for(var i = 0; i < names.length; i++) {
-				Temp.insert({name: names[i], id: i});
-			}
-		}
+	
+		// initialize appId and secret for Facebook OAuth login
+		Accounts.loginServiceConfiguration.remove({
+  		service: "facebook"
+		});
+
+		Accounts.loginServiceConfiguration.insert({
+    	service: "facebook",
+    	appId: "335814393167914",
+    	secret: "7beb443e431575153876e499721955fa"
+		});
 	});
 }
+
+////////////////////////////////////////////////////////////
+/////////////  END SERVER BLOCK   //////////////////////////
+////////////////////////////////////////////////////////////
+

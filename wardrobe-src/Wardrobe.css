@@ -1,7 +1,35 @@
 /* CSS declarations go here */
+html{
+	background-image:url('tweed.png');
+}
 body{
-	background-color:#DDDDDD;
+	background-image:url('tweed.png');
 }
 form{
 	background-color:#FFFFFF;
+}
+.centered-login{
+	position:fixed;
+	top:50%;
+	left:50%;
+	width:200px;
+	height:100px;
+	margin-left:-100px;
+	margin-top:-50px;
+	text-align:center;
+}
+
+.main-float-body{
+	border: 1px solid #777777;
+	z-index: 1000;
+	background: white;
+	box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.3);
+	-webkit-box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.3);
+	border-radius: 4px;
+	padding: 8px 12px;
+	width: 800px;
+	font-size: 16px;
+	color: #333;
+
+	margin:auto;
 }
