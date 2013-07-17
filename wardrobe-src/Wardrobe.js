@@ -24,10 +24,12 @@ ImageDataFS.allow({
 ////////////////////////////////////////////////////////////
 
 if (Meteor.isClient) {
+
 	Meteor.startup(function() {
 		console.log("started at " + location.href);
 
 		$('#imgUpload').change(function(){
+			console.log("something added");
 			readURL(this);
 		});
 		
@@ -110,6 +112,9 @@ if (Meteor.isClient) {
 
 
 	Template.Main.SignedIn = function(){
+		if(Session.get("activity") == null) {
+			Session.set("activity", "review");
+		}
 		return (Meteor.user() ? true : false);	
 	};
 
@@ -125,7 +130,8 @@ if (Meteor.isClient) {
 					return console.log(error);
 				}
 			});
-			Session.set("activity", "upload");
+			Session.set("activity", "review");
+			console.log("just logged in");
 		}
 	});
 
@@ -137,7 +143,18 @@ if (Meteor.isClient) {
 	Template.loggedIn.UploadActive = function() {
 		return ((Session.get("activity") == "upload") ? true : false);
 	}
+	Template.loggedIn.RateActive = function() {
+		console.log(Session.get("activity"));
+		return ((Session.get("activity") == "rate") ? true : false);
+	}
+	Template.loggedIn.ReviewActive = function() {
+		return ((Session.get("activity") == "review") ? true : false);
+	}
 
+
+	Template.loggedIn.Activity = function() {
+		return Session.get("activity");
+	}
 
 ///////////////////////////////////////////////////////
 ///			functions for 'uploadActivity' template			///
@@ -195,11 +212,19 @@ if (Meteor.isClient) {
 			//alert("if");
 			var myRand = Math.random();
 			console.log(myRand);
-			var imageRecords = ImageData.find({randIndex: {$gte:myRand}}, {sort: {randIndex: 1}});
-			var imageRecord = imageRecords.fetch()[0];
-			if (imageRecord == null) {
-				imageRecords = ImageData.find({randIndex: {$lte:myRand}}, {sort: {randIndex: 1}});
-				imageRecord = imageRecords.fetch()[0];
+			var imageRecords = null;
+			var imageRecord = null;
+
+				var imageRecords = ImageData.find({randIndex: {$gte:myRand}}, {sort: {randIndex: 1}});
+				var imageRecord = imageRecords.fetch()[0];
+				if (imageRecord == null) {
+					console.log("getting to second run query");
+					imageRecords = ImageData.find({randIndex: {$lte:myRand}}, {sort: {randIndex: -1}});
+					imageRecord = imageRecords.fetch()[0];
+				}
+			if(imageRecord == null) {
+				console.log("data base empty");
+				return "#";
 			}
 			Session.set("currImageId", imageRecord.fileId); //***SESSION***
 			Session.set("imageUpdateId", imageRecord._id); //***DEV***
@@ -212,15 +237,19 @@ if (Meteor.isClient) {
 		}
 
 		//alert(JSON.stringify(imageRecord));
-
-		var blob = ImageDataFS.retrieveBlob(imageRecord.fileId, 
-			function(fileItem){
-				if(fileItem.blob)
-					reader.readAsDataURL(fileItem.blob);
-				else
-					reader.readAsDataURL(fileItem.file);
-			});
-		
+		try{
+			var blob = ImageDataFS.retrieveBlob(imageRecord.fileId, 
+				function(fileItem){
+					if(fileItem.blob)
+						reader.readAsDataURL(fileItem.blob);
+					else
+						reader.readAsDataURL(fileItem.file);
+				});
+		} catch (e) {
+			console.log(e);
+			console.log(imageRecord.fileId);
+			console.log(imageRecord._id);
+		}
 		return "#";
 	};
 
@@ -242,6 +271,14 @@ if (Meteor.isClient) {
 			}
 		}
 	});
+
+///////////////////////////////////////////////////////
+///			functions for 'myImages' template						///
+///////////////////////////////////////////////////////
+
+
+
+
 
 ///////////////////////////////////////////////////////
 ///			functions for 'hello' template							///

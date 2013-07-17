@@ -8,8 +8,7 @@
 	{{> Main}}
 </body>
 <template name="Main">
-	{{> myHeader}}
-	{{> myFooter}}
+
 	{{#if SignedIn}}
 		{{> loggedIn}}
 	{{else}}
@@ -19,6 +18,39 @@
 </template>
 
 <template name="myHeader">
+
+ <!-- Header and Nav -->
+  <nav class="top-bar">
+    <ul class="title-area">
+      <!-- Title Area -->
+      <li class="name">
+        <h1>
+          <a href="#">
+            Ezra<span style="color:blue">Style</span>
+          </a>
+        </h1>
+      </li>
+      <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+    </ul>
+ 
+    <section class="top-bar-section">
+
+ 
+      <!-- Right Nav Section -->
+      <ul class="right">
+        <li class="divider"></li>
+        <li><a href="#" onClick="Session.set('activity', 'rate');">Rate</a></li>
+        <li class="divider"></li>
+        <li><a href="#" onClick="Session.set('activity', 'upload');">Upload</a></li>
+        <li class="divider" ></li>
+        <li><a href="#" onClick="Session.set('activity', 'review');">Review</a></li>
+
+
+      </ul>
+    </section>
+  </nav>
+  <!-- End Header and Nav -->
+
 </template>
 
 <template name="myFooter">
@@ -59,11 +91,17 @@
 
 
 <template name="loggedIn">
+	{{> myHeader}}
 	{{#if	UploadActive}}
 		{{>	uploadActivity}}
 	{{else}}
-		{{> rateActivity}}
+		{{#if RateActive}}
+			{{> rateActivity}}
+		{{else}}
+			{{> allUploaded}}
+		{{/if}}
 	{{/if}}
+	{{> myFooter}}
 </template>
 
 <template name="uploadActivity">
@@ -104,5 +142,42 @@
 		</div>
 	</div>
 </template>
+
+<template name="allUploaded">
+<div class="row">
+    <div id="gallery" class="twelve columns"><br />
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+        <img src="img_06.jpeg" alt="slide image">
+    </div>
+</div>
+
+</template>
+
 
 
