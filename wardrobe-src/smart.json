@@ -1,7 +1,6 @@
 {
   "packages": {
     "collectionFS": {},
-    "foundation": {},
-    "imagemagick": {}
+    "foundation": {}
   }
 }

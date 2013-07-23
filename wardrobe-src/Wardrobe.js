@@ -33,6 +33,11 @@ if (Meteor.isClient) {
 			readURL(this);
 		});
 		
+		Meteor.call('getFilePickerApiKey',		// potential race condition. 
+			function(error, result){						// almost impossible though.
+				console.log(result);
+				filepicker.setKey(result);	
+			});
 	});
 
 
@@ -160,22 +165,31 @@ if (Meteor.isClient) {
 ///			functions for 'uploadActivity' template			///
 ///////////////////////////////////////////////////////
 
+	Template.uploadActivity.rendered = function() {
+		filepicker.constructWidget(document.getElementById('imgUpload'));
+		console.log("getting here");
+	};
+
 	Template.uploadActivity.events({
 		'click .submitButton' : function(e) {
-			var files = $("#imgUpload").prop("files");
+			//var files = $("#imgUpload").prop("files");
 			
-			var myFileId = ImageDataFS.storeFile(files[0]);
+			//var myFileId = ImageDataFS.storeFile(files[0]);
 			// now we need to store the fileId in ImageData so
 			// we can access it later for image recall.
 			
 			//alert("helloworld");
+			
+			var currFileURL = $('#imgUpload').val();
+
 			try{
 				ImageData.insert({"owner":Meteor.user()._id,
-												"fileId":myFileId,
+												"fileUrl":currFileURL,
 												"randIndex":Math.random(),
 												"rated":0,
 												"up":0,
-												"down":0
+												"down":0,
+												"votes":{}
 												});
 			}catch(e){
 			alert(e);
@@ -183,6 +197,12 @@ if (Meteor.isClient) {
 			//alert(myFileId);
 			//alert("got here");
 			Session.set("activity", "rate");
+		},
+		'change #imgUpload' : function(e) {
+			console.log('change event captured');
+			// here we will now need to update our preview element.
+			var imgURL = e.target.value;
+			$('#preview').attr('src', imgURL);
 		}
 	});
 
@@ -198,6 +218,12 @@ if (Meteor.isClient) {
 		}
 	}
 
+	/*
+	 * handles the logic for collision detection between 
+	 * voted images and non-user images.
+	 *
+	 *
+	 */
 	Template.rateActivity.randImage = function() {
 		
 		var reader = new FileReader();
@@ -471,9 +497,28 @@ if (Meteor.isServer) {
 
 		Accounts.loginServiceConfiguration.insert({
     	service: "facebook",
-    	appId: "335814393167914",
+    	appId: "392488057467249",
     	secret: "7beb443e431575153876e499721955fa"
 		});
+
+
+
+	});
+	/** 
+	 * meteor methods on the server side is to be called by 
+	 * the 
+	 */
+	Meteor.methods({
+		recentUpload: function(userId) {
+			// here we will want to get the most recent upload	
+
+
+			console.log("getting called at least, arg = " + arg);
+			return "hellworld";	
+		},
+		getFilePickerApiKey: function() {
+			return 'AUJvtLFH9ShOzNd1sxZTvz';
+		}
 	});
 }
 

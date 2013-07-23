@@ -3,8 +3,7 @@
   "dependencies": {
     "basePackages": {
       "collectionFS": {},
-      "foundation": {},
-      "imagemagick": {}
+      "foundation": {}
     },
     "packages": {
       "collectionFS": {
@@ -14,13 +13,8 @@
       },
       "foundation": {
         "git": "https://github.com/ewall/meteor-foundation.git",
-        "tag": "v4.2.3",
-        "commit": "8e780b8c80c94bf64f1cbd66142dda6b459710bb"
-      },
-      "imagemagick": {
-        "git": "https://github.com/sylvaingi/meteor-imagemagick.git",
-        "tag": "v0.1.1",
-        "commit": "da8e0f23c2ef456ad6c591430d7898b4c787bde9"
+        "tag": "v4.3.0",
+        "commit": "db6e505f8662988f6f02e5f445b37c94ad562ed1"
       }
     }
   }
