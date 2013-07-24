@@ -26,7 +26,7 @@
       <li class="name">
         <h1>
           <a href="#">
-            Ezra<span style="color:blue">Style</span>
+            Styley<span style="color:#333">.</span><span style="color:blue">me</span>
           </a>
         </h1>
       </li>
@@ -144,39 +144,15 @@
 </template>
 
 <template name="allUploaded">
-<div class="row">
-    <div id="gallery" class="twelve columns"><br />
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-        <img src="img_06.jpeg" alt="slide image">
-    </div>
-</div>
-
+	<div class="main-float-body">	
+		<ul class="large-block-grid-3">
+			{{#each userImages}}
+				<li> 
+					<img style='max-width:220px;max-height:220px;' src = "{{this.thumb}}" /> 	
+				</li>
+			{{/each}}
+		</ul>
+	</div>
 </template>
 
 

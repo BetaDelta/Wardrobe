@@ -38,6 +38,8 @@ if (Meteor.isClient) {
 			});
 	});
 
+	Meteor.subscribe("userData");
+
 
 ///////////////////////////////////////////////////////
 ///			functions for 'Main' template							  ///
@@ -198,7 +200,7 @@ if (Meteor.isClient) {
 			}
 		},
 		'click .downButton' : function() {
-			if(Session.get("imageUpdateId") != null) {
+			if(Session.get("currImageId") != null) {
 				ImageData.update( 
 					{ _id:Session.get("currImageId") }, 
 					{ 
@@ -211,9 +213,19 @@ if (Meteor.isClient) {
 	});
 
 ///////////////////////////////////////////////////////
-///			functions for 'myImages' template						///
+///			functions for 'allUploaded' template				///
 ///////////////////////////////////////////////////////
 
+
+	Template.allUploaded.userImages = function() {
+		//console.log(Meteor.user().uploads);
+		//console.log(Meteor.user());
+		var myFullUser = Meteor.users.findOne({_id : Meteor.user()._id}, {fields: {uploads:1}});
+		var myUploads = myFullUser.uploads;
+		console.log("my Uploads");
+		console.log(myUploads);
+		return myUploads;
+	}
 
 ///////////////////////////////////////////////////////
 ///			functions for 'hello' template							///
@@ -405,11 +417,18 @@ if (Meteor.isServer) {
 				return true;
     	}
     	else return false;
-  	}
+  	},
+		insert : function (userId, user) {
+			if (user._id === userId) {
+				return true;
+			}
+			else return false;
+		}
 	});
 	
-	
-
+	Meteor.publish("userData", function() {
+		return Meteor.users.find({_id:this.userId}, {fields: {'uploads' : 1}});
+	});
 
 
   Meteor.startup(function () {
@@ -422,8 +441,8 @@ if (Meteor.isServer) {
 
 		Accounts.loginServiceConfiguration.insert({
     	service: "facebook",
-    	appId: "335814393167914",
-    	secret: "7beb443e431575153876e499721955fa"
+    	appId: "392488057467249",
+    	secret: "09e038bb304876327fecf91f6bf31d76"
 		});
 
 
