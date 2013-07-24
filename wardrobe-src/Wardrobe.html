@@ -76,7 +76,7 @@
 <!-- START BODY NOW -->
 <template name="loginLite">
 		<div class="centered-login">
-				<div id="login-dropdown-list" class="accounts-dialog" style="position:relative;padding:40px;">
+				<div id="login-dropdown-list" class="accounts-dialog" style="position:relative;padding:40px;width:240px;">
 						Get started today! <br />
 							<div class="login-close-text-clear"></div>
 							<div class="login-text-and-button">
@@ -84,6 +84,16 @@
 							<div class="login-image" id="login-buttons-image-facebook"></div>
 								<span class="text-besides-image sign-in-text-facebook">Sign in with Facebook</span>
 						</div>
+						<div>
+							<h3> or</h3>
+						</div>
+						<form id="login-form" action="action">
+							<div>
+								<input type="email" id="login-email" placeholder="email" />
+								<input type="password" id="login-password" placeholder="password" />
+								<input type="submit" id="login-button" value="Sign In" />
+							</div>
+						</form>
 				</div>
 		</div>
 

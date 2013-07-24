@@ -67,6 +67,37 @@ if (Meteor.isClient) {
 			});
 			Session.set("activity", "review");
 			console.log("just logged in");
+		},
+		'submit #login-form' : function (e, t) {
+			console.log("getting here");
+			e.preventDefault();
+
+			var email = t.find('#login-email').value;
+			var password = t.find('#login-password').value;
+			
+			console.log(email + " | " + password);
+			// VALIDATE input here.
+			
+			Meteor.loginWithPassword(email, password, function(err) {
+				if(err) {
+					console.log("account does not exist");
+					//then user does not exist.
+					var rec = Meteor.users.findOne({email: email});
+					if(rec == null){
+						Accounts.createUser({email:email, password:password}, function(err) {
+							// failed to create user
+							console.log("failed to create user due to: "+err);
+						});
+					} else {
+						// incorrect password, this email is already registered.
+					}
+					//we might try to validate here.
+				} else { 
+					//user has been successfully loged in.
+					console.log("logged in");
+					Session.set('activity', 'rate');
+				}
+			});
 		}
 	});
 
@@ -123,7 +154,8 @@ if (Meteor.isClient) {
 												"rated":0,
 												"up":0,
 												"down":0,
-												"votes": initVote
+												"votes": initVote,
+												"seen": [] // ***DEV*** potential shim.
 												});
 				console.log("record is " + record);
 				// now we need to set the id of what we just created.
@@ -165,8 +197,14 @@ if (Meteor.isClient) {
 	 */
 	Template.rateActivity.nextImage = function() {
 		// we will use $in to prototype, then switch to $nin
-		
-		var imageRecords = ImageData.find({"votes.voter": {$ne : Meteor.user()._id} }, {sort: {_id: -1}});
+		var testArray = [];
+		testArray[0] = Meteor.user()._id;
+
+		console.log(testArray);
+
+		var imageRecords = ImageData.find({"seen": {$nin : [Meteor.user()._id]}} , {sort: {_id: -1}});
+
+		console.log(imageRecords);
 		var imageRecord = imageRecords.fetch()[0];
 		
 		if(imageRecord == null) {
@@ -194,7 +232,8 @@ if (Meteor.isClient) {
 					{ _id:Session.get("currImageId") }, 
 					{ 
 						$inc: { up: 1}, 
-						$push: {votes: {voter:Meteor.user()._id, vote: 1 }}
+						$push: {votes: {voter:Meteor.user()._id, vote: 1 }},
+						$push: {seen: Meteor.user()._id}
 					}
 				);									
 			}
@@ -205,7 +244,8 @@ if (Meteor.isClient) {
 					{ _id:Session.get("currImageId") }, 
 					{ 
 						$inc: { down: 1}, 
-						$push: {votes: {voter:Meteor.user()._id, vote: -1 }}
+						$push: {votes: {voter:Meteor.user()._id, vote: -1 }},
+						$push: {seen: Meteor.user()._id}
 					}
 				);					
 			}
@@ -225,174 +265,6 @@ if (Meteor.isClient) {
 		console.log("my Uploads");
 		console.log(myUploads);
 		return myUploads;
-	}
-
-///////////////////////////////////////////////////////
-///			functions for 'hello' template							///
-///////////////////////////////////////////////////////
-/*
-	Template.hello.greeting = function () {
-		return JSON.stringify(Meteor.user());
-	};
-	
-  Template.hello.testing = function () {
-		return {name:"User"};
-  };
-
-  Template.hello.events({
-    'click input' : function () {
-      // template data, if any, is available in 'this'
-			Meteor.loginWithFacebook({requestPermissions: ['email']},
-			function(error) {
-				if (error) {
-					return console.log(error);
-				}
-			});
-			console.log("helloworld");
-    }
-  });
-
-///////////////////////////////////////////////////////
-///			functions for 'myHeader' template						///
-///////////////////////////////////////////////////////
-
-
-	Template.myHeader.userName = function() {
-		//alert("helloworld");
-		if(Meteor.user() == null) {
-			return "Sign In";
-		} else {
-			return Meteor.user().services.facebook.name;
-		}
-	};
-
-	Template.myHeader.events({
-		'click .login-button' : function() {
-			//alert("helloworld");
-			$('#login-bar').slideDown(300, function(){});
-		}
-	});
-
-///////////////////////////////////////////////////////
-///			functions for 'uploadImage' template				///
-///////////////////////////////////////////////////////
-
-	Template.uploadImage.events({
-		'click .submitButton' : function(e) {
-			var files = $("#imgUpload").prop("files");
-			
-			var myFileId = ImageDataFS.storeFile(files[0]);
-			// now we need to store the fileId in ImageData so
-			// we can access it later for image recall.
-			
-			//alert("helloworld");
-			try{
-				ImageData.insert({"owner":Meteor.user()._id,
-												"fileId":myFileId});
-			}catch(e){
-			alert(e);
-			}
-			alert(myFileId);
-			//alert("got here");
-			
-		}
-	});
-
-///////////////////////////////////////////////////////
-///			functions for 'rateImage' template					///
-///////////////////////////////////////////////////////
-
-
-	 var initializeImage = function () {
-	 //	alert("trying to initialize now");
-		var reader = new FileReader();
-
-		reader.onload = function(e) {
-			$('#subjectImage').attr("src", e.target.result);
-		};
-	
-		//alert(JSON.stringify(Meteor.user()));
-
-		if(Meteor.user() != null){
-			alert("if");
-			var imageRecord = ImageData.findOne({"owner":Meteor.user()._id});
-		}
-		else {
-			alert("else");
-			setTimeout(function() {initializeImage();}, 100);
-			return;
-		}
-
-		var blob = ImageDataFS.retrieveBlob(imageRecord.fileId, function(fileItem){
-			if(fileItem.blob)
-				reader.readAsDataURL(fileItem.blob);
-			else
-				reader.readAsDataURL(fileItem.file);
-		});
-
-		return reader.result;
-	};
-
-	
-	Template.rateImage.randImage = function() {
-		
-		var reader = new FileReader();
-
-		reader.onload = function(e) {
-			$('#subjectImage').attr("src", e.target.result);
-		};
-
-		//alert(JSON.stringify(Meteor.user()));
-		//alert(Meteor.loggingIn());
-		if(Meteor.user() != null){
-			alert("if");
-			var imageRecord = ImageData.findOne({"owner":Meteor.user()._id});
-		}
-		else {
-			alert("else");
-			setTimeout(function() {initializeImage();}, 100);
-			return "#";
-		}
-
-		//alert(JSON.stringify(imageRecord));
-
-		var blob = ImageDataFS.retrieveBlob(imageRecord.fileId, 
-			function(fileItem){
-				if(fileItem.blob)
-					reader.readAsDataURL(fileItem.blob);
-				else
-					reader.readAsDataURL(fileItem.file);
-			});
-		
-		return "#";
-	};
-
-
-	Template.rateImage.rendered = function() {
-		//alert("rate image page rendered");
-		//initializeImage();
-	};
-
-
-
-
-*/
-
-///////////////////////////////////////////////////////
-///			auxiliary functions for application					///
-///////////////////////////////////////////////////////
-
-
-	function readURL(input) {
-		if(input.files && input.files[0]) {
-			var reader = new FileReader();
-
-			reader.onload = function(e) {
-				$('#preview').attr('src', e.target.result);
-			}
-
-			reader.readAsDataURL(input.files[0]);
-		}
 	}
 	
 }
