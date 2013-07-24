@@ -17,8 +17,6 @@ ImageDataFS.allow({
 /////////////  END DATA MODEL   ////////////////////////////
 ////////////////////////////////////////////////////////////
 
-
-
 ////////////////////////////////////////////////////////////
 /////////////  BEGIN CLIENT BLOCK   ////////////////////////
 ////////////////////////////////////////////////////////////
@@ -39,76 +37,6 @@ if (Meteor.isClient) {
 				filepicker.setKey(result);	
 			});
 	});
-
-
-////////////// UNTRUSTED BLOCK //////////////////////////
-
-/*
-    (function(d, debug){
-         var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-         if (d.getElementById(id)) {return;}
-         js = d.createElement('script'); js.id = id; js.async = true;
-         js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
-         ref.parentNode.insertBefore(js, ref);
-       }(document,  false));
-       
-    window.fbAsyncInit = function() {
-            // init the FB JS SDK
-        FB.init({
-          appId      : 'YOUR_APP_ID', // App ID from the App Dashboard
-          channelUrl : '//localhost:3000/channel.html', // Channel File for x-domain communication for localhost debug
-          // channelUrl : '//yoururl.com/channel.html', // Channel File for x-domain communication
-          status     : true, // check the login status upon init?
-          cookie     : true, // set sessions cookies to allow your server to access the session?
-          xfbml      : true  // parse XFBML tags on this page?
-        });
-    
-        FB.getLoginStatus(checkLoginStatus);
-        
-        function call_facebook_login(response){
-            FB.api('/me', function(fb_user){
-                var access_token = response.authResponse.accessToken;
-                Meteor.call('facebook_login', fb_user, access_token, function(error, user_id){
-                    if (!error){
-                        Accounts._makeClientLoggedIn(user_id, access_token);
-                    }
-                });
-            });
-        }
-    
-        function checkLoginStatus(response) {
-            if(response && response.status == 'connected') {
-                console.log('User is authorized');
-          
-                // Now Personalize the User Experience
-                console.log('Access Token: ' + response.authResponse.accessToken);
-                console.log(response)
-                call_facebook_login(response);
-            } else {
-                console.log('User is not authorized');
-                
-                // Login the user
-                FB.login(function(response) {
-                    if (response.authResponse) {
-                        console.log('Welcome!  Fetching your information.... ');
-                        call_facebook_login(response);
-                    } else {
-                        console.log('User cancelled login or did not fully authorize.');
-                    }
-                }, {scope: 'email,friends_likes,friends_birthday'});
-            }
-        }
-    }
-
-*/
-/////////////// end untrusted block /////////////////////
-
-
-
-
-
-
-
 
 
 ///////////////////////////////////////////////////////
@@ -183,17 +111,29 @@ if (Meteor.isClient) {
 			var currFileURL = $('#imgUpload').val();
 
 			try{
-				ImageData.insert({"owner":Meteor.user()._id,
+				var initVote = [];
+				
+				//initVote.push({voter:Meteor.user()._id, vote: 0}); // ***DEV***
+
+				var record = ImageData.insert({"owner":Meteor.user()._id,
 												"fileUrl":currFileURL,
 												"randIndex":Math.random(),
 												"rated":0,
 												"up":0,
 												"down":0,
-												"votes":{}
+												"votes": initVote
 												});
-			}catch(e){
-			alert(e);
+				console.log("record is " + record);
+				// now we need to set the id of what we just created.
+				
+				Meteor.users.update(
+											{_id : Meteor.user()._id }, 
+											{$push : {uploads : {fileId: record, thumb:currFileURL}}}
+										); // add this record to our list of uploads.
+			} catch(e) {
+				alert(e);
 			}
+
 			//alert(myFileId);
 			//alert("got here");
 			Session.set("activity", "rate");
@@ -214,86 +154,58 @@ if (Meteor.isClient) {
 		if(Session.get("currImageId") == null) {
 			return null;
 		} else {
-			return ImageData.findOne({fileId:Session.get("currImageId")});
+			return ImageData.findOne({_id:Session.get("currImageId")});
 		}
 	}
 
 	/*
-	 * handles the logic for collision detection between 
-	 * voted images and non-user images.
-	 *
-	 *
+	 * returns the image URL from filepicker for image handling.
 	 */
-	Template.rateActivity.randImage = function() {
+	Template.rateActivity.nextImage = function() {
+		// we will use $in to prototype, then switch to $nin
 		
-		var reader = new FileReader();
-
-		reader.onload = function(e) {
-			$('#subjectImage').attr("src", e.target.result);
-		};
-
-		//alert(JSON.stringify(Meteor.user()));
-		//alert(Meteor.loggingIn());
-		if(Meteor.user() != null){
-			//alert("if");
-			var myRand = Math.random();
-			console.log(myRand);
-			var imageRecords = null;
-			var imageRecord = null;
-
-				var imageRecords = ImageData.find({randIndex: {$gte:myRand}}, {sort: {randIndex: 1}});
-				var imageRecord = imageRecords.fetch()[0];
-				if (imageRecord == null) {
-					console.log("getting to second run query");
-					imageRecords = ImageData.find({randIndex: {$lte:myRand}}, {sort: {randIndex: -1}});
-					imageRecord = imageRecords.fetch()[0];
-				}
-			if(imageRecord == null) {
-				console.log("data base empty");
-				return "#";
-			}
-			Session.set("currImageId", imageRecord.fileId); //***SESSION***
-			Session.set("imageUpdateId", imageRecord._id); //***DEV***
+		var imageRecords = ImageData.find({"votes.voter": {$ne : Meteor.user()._id} }, {sort: {_id: -1}});
+		var imageRecord = imageRecords.fetch()[0];
+		
+		if(imageRecord == null) {
+			console.log("you have rated all available images on the database");
+			imageRecord = {fileUrl: "#"};
 		}
-		else {
-			alert("else");
-			// this should never happen, and will crash the application.
-			setTimeout(function() {initializeImage();}, 100);
-			return "#";
-		}
+		// set the current image.
+		Session.set('currImageId', imageRecord._id);
 
-		//alert(JSON.stringify(imageRecord));
-		try{
-			var blob = ImageDataFS.retrieveBlob(imageRecord.fileId, 
-				function(fileItem){
-					if(fileItem.blob)
-						reader.readAsDataURL(fileItem.blob);
-					else
-						reader.readAsDataURL(fileItem.file);
-				});
-		} catch (e) {
-			console.log(e);
-			console.log(imageRecord.fileId);
-			console.log(imageRecord._id);
-		}
-		return "#";
+		console.log(imageRecord);
+		return imageRecord;
 	};
-
+	
+	/* 
+	 * events handler for events on the rate page. should handle:
+	 *
+	 *		-> Upvote
+	 *		-> Downvote
+	 *		-> Flagging (* not yet implemented)
+	 */
 	Template.rateActivity.events({
 		'click .upButton' : function() {
-			if(Session.get("imageUpdateId") != null) {
+			if(Session.get("currImageId") != null) {
 				ImageData.update( 
-					{ _id:Session.get("imageUpdateId") }, 
-					{ $inc: { up: 1} }
+					{ _id:Session.get("currImageId") }, 
+					{ 
+						$inc: { up: 1}, 
+						$push: {votes: {voter:Meteor.user()._id, vote: 1 }}
+					}
 				);									
 			}
 		},
 		'click .downButton' : function() {
 			if(Session.get("imageUpdateId") != null) {
 				ImageData.update( 
-					{ _id:Session.get("imageUpdateId") }, 
-					{ $inc: { down: 1} }
-				);									
+					{ _id:Session.get("currImageId") }, 
+					{ 
+						$inc: { down: 1}, 
+						$push: {votes: {voter:Meteor.user()._id, vote: -1 }}
+					}
+				);					
 			}
 		}
 	});
@@ -301,9 +213,6 @@ if (Meteor.isClient) {
 ///////////////////////////////////////////////////////
 ///			functions for 'myImages' template						///
 ///////////////////////////////////////////////////////
-
-
-
 
 
 ///////////////////////////////////////////////////////
@@ -487,6 +396,22 @@ if (Meteor.isClient) {
 
 
 if (Meteor.isServer) {
+	
+	Meteor.users.allow({
+  	update: function (userId, user, fields, modifier) {
+    	// can only change your own documents
+    	if(user._id === userId)
+    	{
+				return true;
+    	}
+    	else return false;
+  	}
+	});
+	
+	
+
+
+
   Meteor.startup(function () {
     // code to run on server at startup
 	
@@ -497,7 +422,7 @@ if (Meteor.isServer) {
 
 		Accounts.loginServiceConfiguration.insert({
     	service: "facebook",
-    	appId: "392488057467249",
+    	appId: "335814393167914",
     	secret: "7beb443e431575153876e499721955fa"
 		});
 
